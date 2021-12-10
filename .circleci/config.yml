@@ -22,19 +22,16 @@ jobs:
           command: mkdir -p /home/circleci/project/ && wget https://github.com/allure-framework/allure2/releases/download/2.17.1/allure-2.17.1.zip && unzip allure*.zip && rm allure*.zip && mv allure-2.* /home/circleci/project/allure
       - run:
           name: Run tests
-          command: pytest
+          command: pytest || true
       - run:
           name: Run tests with pytest; html extension
-          command: pytest --html=test_result_report.html --self-contained-html
+          command: pytest --html=test_result_report.html --self-contained-html || true
       - run:
           name: Run tests with pytest; txt extension
-          command: pytest > test_result_default.txt
-      - run:
-          name: Run tests with pytest; log extension
-          command: pytest -m fruits > test_result_03.log
+          command: pytest -m fruits > test_result_03.txt
       - run:
           name: Run tests with allure
-          command: pytest --alluredir=test_result_alluredir
+          command: pytest --alluredir=test_result_alluredir || true
       - run:
           name: Generate allure html report
           command: /home/circleci/project/allure/bin/./allure generate test_result_alluredir
@@ -45,9 +42,7 @@ jobs:
           path: allure-report
           destination: allure-report
       - store_artifacts:
-          path: test_result_default.txt
-      - store_artifacts:
-          path: test_result_03.log
+          path: test_result_03.txt
       - store_artifacts:
           path: test_result_alluredir
 
