@@ -18,6 +18,10 @@ class TestCap:
 def test_capitalize_string_03():
     assert capitalize_string('apple') != 'Pear'
 
+@allure.feature('Random Fail')
+def test_random_fail():
+    assert randint(0,1) == 1
+
 def capitalize_string(s):
   if not isinstance(s, str):
     raise TypeError('Please provide a string')
