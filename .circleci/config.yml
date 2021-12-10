@@ -1,0 +1,70 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@1.2
+
+jobs:
+  build-test-upload:
+    docker:
+      - image: cimg/python:3.8
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+      - run: 
+          name: Get UTC Time
+          command: pwd && curl "http://worldtimeapi.org/api/timezone/etc/utc"
+      - run:
+          name: Install Java JRE
+          command: sudo apt update && sudo apt install default-jre -y
+      - run:
+          name: Download allure commandline
+          command: wget https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.17.1/allure-commandline-2.17.1.zip && unzip allure*.zip && rm allure*.zip && mv allure* /home/circleci/project/allure
+      - run:
+          name: Run tests
+          command: pytest
+      - run:
+          name: Run tests with pytest; html extension
+          command: pytest --html=test_result_report.html --self-contained-html
+      - run:
+          name: Run tests with pytest; txt extension
+          command: pytest > test_result_default.txt
+      - run:
+          name: Run tests with pytest; log extension
+          command: pytest -m fruits > test_result_03.log
+      - run:
+          name: Run tests with allure
+          command: pytest --alluredir=test_result_alluredir
+      - run:
+          name: Generate allure html report
+          command: /home/circleci/project/allure/bin/./allure generate test_result_alluredir
+      - store_artifacts:
+          path: test_result_report.html
+          destination: html_report
+      - store_artifacts:
+          path: allure-report
+          destination: allure-report
+      - store_artifacts:
+          path: test_result_default.txt
+      - store_artifacts:
+          path: test_result_03.log
+
+workflows:
+  main-ci-workflow:
+    jobs:
+      - build-test-upload:
+          filters:
+            branches:
+              only:
+                - main
+                - 'releases/**'
+  nightly-ci-workflow:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - build-test-upload

@@ -1,0 +1,59 @@
+name: Github Action with pytest artifacts and cron
+on:
+  push:
+    branches:
+      - main
+      - 'release/**'
+      - 'feature/**'
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  get-time:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get UTC Time
+        run: curl "http://worldtimeapi.org/api/timezone/etc/utc"
+
+      - name: Get Central Time
+        run: curl "http://worldtimeapi.org/api/timezone/America/Chicago"
+
+  build-test-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Python 3
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests with pytest; html extension
+        run: pytest --html=test_result_report.html --self-contained-html
+
+      - name: Run tests with pytest; txt extension
+        run: pytest > test_result_default.txt
+
+      - name: Run tests with pytest; txt extension
+        run: pytest hello_test.py -k test_capitalize_string_01 > test_result_01.txt
+
+      - name: Run tests with pytest; txt extension
+        run: pytest hello_test.py::TestCap::test_capitalize_string_02 > test_result_02.txt
+
+      - name: Run tests with pytest; log extension
+        run: pytest -m fruits > test_result_03.log
+
+      - name: Archive test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-testing-report
+          path: |
+            test_result**.log
+            test_result**.txt
+            test_result**.html
+          retention-days: 12
