@@ -57,7 +57,8 @@ workflows:
             branches:
               only:
                 - main
-                - 'releases/**'
+                - 'release/**'
+                - 'feature/**'
   nightly-ci-workflow:
     triggers:
       - schedule:
