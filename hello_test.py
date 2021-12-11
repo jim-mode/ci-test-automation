@@ -1,5 +1,6 @@
 import allure
 import pytest
+from random import randint
 
 @allure.feature('Feature1')
 @allure.story('Story1')
