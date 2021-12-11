@@ -19,25 +19,35 @@ jobs:
           command: sudo apt update && sudo apt install default-jre -y
       - run:
           name: Download allure commandline
-          command: wget https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.17.1/allure-commandline-2.17.1.zip && unzip allure*.zip && rm allure*.zip && mv allure* /home/circleci/project/allure
+          command: mkdir -p /home/circleci/project/ && wget https://github.com/allure-framework/allure2/releases/download/2.17.1/allure-2.17.1.zip && unzip allure*.zip && rm allure*.zip && mv allure-2.* /home/circleci/project/allure
       - run:
           name: Run tests
-          command: pytest
+          command: pytest || true
       - run:
           name: Run tests with pytest; html extension
-          command: pytest --html=test_result_report.html --self-contained-html
+          command: pytest --html=test_result_report.html --self-contained-html || true
       - run:
           name: Run tests with pytest; txt extension
-          command: pytest > test_result_default.txt
-      - run:
-          name: Run tests with pytest; log extension
-          command: pytest -m fruits > test_result_03.log
+          command: pytest -m fruits > test_result_03.txt
       - run:
           name: Run tests with allure
-          command: pytest --alluredir=test_result_alluredir
+          command: pytest --alluredir=test_result_alluredir || true
+      - run:
+          name: Get Previous Execution History
+          command: |
+            curl -H "Circle-Token: $CIRCLE_TOKEN" https://circleci.com/api/v1.1/project/github/jim-mode/ci-test-automation/latest/artifacts \
+            | grep -o 'https://[^"]*' \
+            | grep allure-history.zip \
+            | wget --verbose --header "Circle-Token: $CIRCLE_TOKEN" --input-file - || true
+      - run:
+          name: Extract History
+          command: unzip allure-history.zip && rm allure-history.zip && mv history test_result_alluredir || true
       - run:
           name: Generate allure html report
           command: /home/circleci/project/allure/bin/./allure generate test_result_alluredir
+      - run:
+          name: Zip Allure History
+          command: cd ./allure-report/ && zip -r history.zip history
       - store_artifacts:
           path: test_result_report.html
           destination: html_report
@@ -45,10 +55,12 @@ jobs:
           path: allure-report
           destination: allure-report
       - store_artifacts:
-          path: test_result_default.txt
+          path: test_result_03.txt
       - store_artifacts:
-          path: test_result_03.log
-
+          path: test_result_alluredir
+      - store_artifacts:
+          path: allure-report/history.zip
+          destination: allure-history.zip
 workflows:
   main-ci-workflow:
     jobs:
@@ -57,8 +69,8 @@ workflows:
             branches:
               only:
                 - main
-                - release/*
-                - feature/*
+                - /release.*/
+                - /feature.*/
   nightly-ci-workflow:
     triggers:
       - schedule:

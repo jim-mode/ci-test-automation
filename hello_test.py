@@ -1,5 +1,6 @@
 import allure
 import pytest
+from random import randint
 
 @allure.feature('Feature1')
 @allure.story('Story1')
@@ -17,6 +18,10 @@ class TestCap:
 @pytest.mark.fruits
 def test_capitalize_string_03():
     assert capitalize_string('apple') != 'Pear'
+
+@allure.feature('Random Fail')
+def test_random_fail():
+    assert randint(0,1) == 1
 
 def capitalize_string(s):
   if not isinstance(s, str):
