@@ -37,7 +37,7 @@ jobs:
           command: |
             curl -H "Circle-Token: $CIRCLE_TOKEN" https://circleci.com/api/v1.1/project/github/jim-mode/qa-automation-ci-cd/latest/artifacts \
             | grep -o 'https://[^"]*' \
-            | grep 0/history.zip \
+            | grep 0/allure-report/history.zip \
             | wget --verbose --header "Circle-Token: $CIRCLE_TOKEN" --input-file - || true
       - run:
           name: Extract History
@@ -58,7 +58,6 @@ jobs:
           path: test_result_03.txt
       - store_artifacts:
           path: test_result_alluredir
-
 workflows:
   main-ci-workflow:
     jobs:
