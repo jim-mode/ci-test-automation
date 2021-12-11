@@ -13,7 +13,7 @@ jobs:
           pkg-manager: pip
       - run: 
           name: Get UTC Time
-          command: pwd && curl "http://worldtimeapi.org/api/timezone/etc/utc"
+          command: pwd && curl "http://worldtimeapi.org/api/timezone/etc/utc" || true
       - run:
           name: Install Java JRE
           command: sudo apt update && sudo apt install default-jre -y
@@ -49,13 +49,11 @@ jobs:
           name: Zip Allure History
           command: cd ./allure-report/ && zip -r history.zip history
       - store_artifacts:
-          path: test_result_report.html
-          destination: html_report
-      - store_artifacts:
           path: allure-report
           destination: allure-report
       - store_artifacts:
-          path: test_result_03.txt
+          path: test_result_report.html
+          destination: html_report
       - store_artifacts:
           path: test_result_alluredir
       - store_artifacts:
