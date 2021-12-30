@@ -41,3 +41,12 @@ pytest --alluredir=test_result_alluredir
 
 allure generate test_result_alluredir --clean
 ```
+
+### Google Chrome Validation Snips
+```
+# Getting a PDF Page
+google-chrome --headless --no-sandbox --print-to-pdf="google_home.pdf" https://google.com
+
+# Use selenium & webdriver to take a screenshot
+python chrome.py
+```
