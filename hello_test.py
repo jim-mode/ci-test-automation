@@ -1,6 +1,9 @@
 import allure
 import pytest
 from random import randint
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 
 @allure.feature('Feature1')
 @allure.story('Story1')
@@ -22,6 +25,29 @@ def test_capitalize_string_03():
 @allure.feature('Random Fail')
 def test_random_fail():
     assert randint(0,1) == 1
+
+@allure.feature('Selenium with Chrome')
+@allure.story('Story4')
+@pytest.mark.web
+def test_selenium():
+    chrome_options = Options()
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--window-size=800,640')
+
+    driver = webdriver.Chrome(options=chrome_options)
+
+    driver.get('http://google.com/')
+    assert "Google" == driver.title
+    search_box = driver.find_element(By.NAME, 'q')
+    search_box.send_keys('mode transportation')
+    search_box.submit()
+    screenshot = driver.save_screenshot('google_search.png')
+    assert "MODE Transportation" in driver.page_source
+    assert "Latest Lottery Number" not in driver.page_source
+
+    driver.close()
+    driver.quit()
 
 def capitalize_string(s):
   if not isinstance(s, str):

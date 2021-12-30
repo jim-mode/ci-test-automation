@@ -6,7 +6,7 @@ orbs:
 jobs:
   build-test-upload:
     docker:
-      - image: cimg/python:3.8
+      - image: nojson/cimg_py:chrome-96
     steps:
       - checkout
       - python/install-packages:
@@ -14,21 +14,6 @@ jobs:
       - run: 
           name: Get UTC Time
           command: pwd && curl "http://worldtimeapi.org/api/timezone/etc/utc" || true
-      - run:
-          name: Install Java JRE
-          command: sudo apt update && sudo apt install default-jre -y
-      - run:
-          name: Download allure commandline
-          command: mkdir -p /home/circleci/project/ && wget https://github.com/allure-framework/allure2/releases/download/2.17.1/allure-2.17.1.zip && unzip allure*.zip && rm allure*.zip && mv allure-2.* /home/circleci/project/allure
-      - run:
-          name: Run tests
-          command: pytest || true
-      - run:
-          name: Run tests with pytest; html extension
-          command: pytest --html=test_result_report.html --self-contained-html || true
-      - run:
-          name: Run tests with pytest; txt extension
-          command: pytest -m fruits > test_result_03.txt
       - run:
           name: Run tests with allure
           command: pytest --alluredir=test_result_alluredir || true
@@ -44,7 +29,7 @@ jobs:
           command: unzip allure-history.zip && rm allure-history.zip && mv history test_result_alluredir || true
       - run:
           name: Generate allure html report
-          command: /home/circleci/project/allure/bin/./allure generate test_result_alluredir
+          command: /home/circleci/allure/bin/./allure generate test_result_alluredir
       - run:
           name: Zip Allure History
           command: cd ./allure-report/ && zip -r history.zip history
@@ -56,6 +41,8 @@ jobs:
           destination: html_report
       - store_artifacts:
           path: test_result_alluredir
+      - store_artifacts:
+          path: google_search.png
       - store_artifacts:
           path: allure-report/history.zip
           destination: allure-history.zip
