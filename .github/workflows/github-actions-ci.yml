@@ -68,4 +68,5 @@ jobs:
             test_result**.log
             test_result**.txt
             test_result**.html
+            *.png
           retention-days: 12

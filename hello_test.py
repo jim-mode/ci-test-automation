@@ -49,6 +49,25 @@ def test_selenium():
     driver.close()
     driver.quit()
 
+@allure.feature('Selenium with Chrome User Agent')
+@allure.story('Story5')
+@pytest.mark.web
+def test_selenium():
+    chrome_options = Options()
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--window-size=800,640')
+    chrome_options.add_argument("user-agent=Mozilla/5.0 (MY AWSOME USER AGENT) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.61 Safari/537.36")
+
+    driver = webdriver.Chrome(options=chrome_options)
+
+    driver.get('http://whatsmyuseragent.org/')
+    screenshot = driver.save_screenshot('user_agent.png')
+    assert "MY AWSOME USER AGENT" in driver.page_source
+
+    driver.close()
+    driver.quit()
+
 def capitalize_string(s):
   if not isinstance(s, str):
     raise TypeError('Please provide a string')

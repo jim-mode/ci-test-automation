@@ -44,6 +44,8 @@ jobs:
       - store_artifacts:
           path: google_search.png
       - store_artifacts:
+          path: user_agent.png
+      - store_artifacts:
           path: allure-report/history.zip
           destination: allure-history.zip
 workflows:
